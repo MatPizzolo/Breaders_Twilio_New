@@ -21,15 +21,25 @@ def whatsapp_webhook(request):
         to_number = request.POST.get('To', '')
         message_body = request.POST.get('Body', '').strip()
         message_sid = request.POST.get('MessageSid', '')
-        
-        logger.info(f"Received message from {from_number}: {message_body[:50]}...")
+        # Get additional parameters to identify message type
+        message_status = request.POST.get('MessageStatus', '')
+        event_type = request.POST.get('EventType', '')
         
         # Initialize response
         twiml_response = MessagingResponse()
         
-        if not message_body:
-            logger.warning("Received empty message body")
-            twiml_response.message("I couldn't understand your message. Please try again.")
+        # Check if this is a status update or other non-message webhook
+        if message_status or event_type:
+            logger.debug(f"Received status update: Status={message_status}, Event={event_type}")
+            # Just acknowledge receipt for status updates
+            return HttpResponse(status=204)  # No content response
+        
+        # Log actual messages with content
+        if message_body:
+            logger.info(f"Received message from {from_number}: {message_body[:50]}...")
+        else:
+            logger.debug(f"Received webhook with empty body from {from_number}")
+            # For empty messages from actual users (not status updates), send a response
             return HttpResponse(str(twiml_response))
         
         # Process the message using the conversation handler

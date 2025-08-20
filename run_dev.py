@@ -192,7 +192,7 @@ def run_django():
         # Iniciar el servidor de desarrollo de Django
         print(f"🚀 Iniciando servidor Django en el puerto {port}...")
         django_process = subprocess.Popen(
-            [sys.executable, 'manage.py', 'runserver', f'0.0.0.0:{port}'],
+            [sys.executable, 'manage.py', 'runserver', f'0.0.0.0:{port}', '--verbosity', '2'],
             cwd=os.path.dirname(os.path.abspath(__file__))
         )
         processes.append(django_process)
